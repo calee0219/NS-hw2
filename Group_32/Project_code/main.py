@@ -39,7 +39,7 @@ def load_xml(path):
 
 def load_training_data():
     """Load training data"""
-    #print(sysmon_matrix)
+    print(sysmon_matrix)
 
 
 def main():
@@ -51,7 +51,7 @@ def main():
     print("Testing folder: ", folder_path)
     subfolder = os.listdir(folder_path)
     for testcase in subfolder:
-        print("{index}: ".format(index=testcase), end="")
+        print("{index}: ".format(index=testcase), end='')
         wireshark_data = load_json(os.path.join(folder_path, testcase, "Wireshark.json"))
         sysmon_data = load_xml(os.path.join(folder_path, testcase, "Sysmon.xml"))
         security_data = load_xml(os.path.join(folder_path, testcase, "Security.xml"))
@@ -60,7 +60,7 @@ def main():
         #print(security_data)
         print(end="\n")
     # Load Training data
-    load_training_data()
+    df = load_training_data()
 
 
 if __name__ == "__main__":
