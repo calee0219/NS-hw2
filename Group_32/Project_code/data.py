@@ -13,7 +13,7 @@ import numpy as np
 import xmltodict
 import sklearn
 import pandas as pd
-event_name = "Image"
+event_name = "OriginalFileName"
 
 
 def usage():
@@ -57,6 +57,7 @@ def collect_sysmon(sysmon):
         row_len = len(row)
         for i in range(tot_feature-row_len):
             row.append(0)
+
 
     # Write sysmon data into sysmon_data.py
     with open("./training_data.py", 'w') as writer:
