@@ -6,9 +6,14 @@ import sys
 import os
 import json
 
-import xml.etree.ElementTree as ET
+#import xml.etree.ElementTree as ET
 import xmltodict
+import collections
+orderedDict = collections.OrderedDict()
+from collections import OrderedDict
 #import numpy as np
+
+from sysmon_data import *
 
 
 def usage():
@@ -32,6 +37,11 @@ def load_xml(path):
     return xml_data
 
 
+def load_training_data():
+    """Load training data"""
+    #print(sysmon_matrix)
+
+
 def main():
     """main function"""
     if len(sys.argv) != 2:
@@ -39,12 +49,18 @@ def main():
         return
     folder_path = str(sys.argv[1])
     print("Testing folder: ", folder_path)
-    wireshark_data = load_json(os.path.join(folder_path, "Wireshark.json"))
-    sysmon_data = load_xml(os.path.join(folder_path, "Sysmon.xml"))
-    security_data = load_xml(os.path.join(folder_path, "Security.xml"))
-    #print(wireshark_data)
-    print(sysmon_data)
-    #print(security_data)
+    subfolder = os.listdir(folder_path)
+    for testcase in subfolder:
+        print("{index}: ".format(index=testcase), end="")
+        wireshark_data = load_json(os.path.join(folder_path, testcase, "Wireshark.json"))
+        sysmon_data = load_xml(os.path.join(folder_path, testcase, "Sysmon.xml"))
+        security_data = load_xml(os.path.join(folder_path, testcase, "Security.xml"))
+        #print(wireshark_data)
+        #print(sysmon_data)
+        #print(security_data)
+        print(end="\n")
+    # Load Training data
+    load_training_data()
 
 
 if __name__ == "__main__":
