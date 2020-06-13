@@ -10,8 +10,9 @@ import xmltodict
 import numpy as np
 import pandas as pd
 from sklearn import tree
+from sklearn.neighbors import KNeighborsClassifier
 
-from sysmon_data import *
+from training_data import *
 
 
 def usage():
@@ -35,12 +36,37 @@ def load_xml(path):
     return xml_data
 
 
-def decision_tree(x):
+def decision_tree(x, predict):
     """Run Decision Tree"""
     y = [1, 2, 3, 4, 5, 6]
     clf = tree.DecisionTreeClassifier()
     clf = clf.fit(x, y)
-    return clf
+    return clf.predict([predict])
+
+
+def knn(x, predict):
+    """rum knn"""
+    y = [1, 2, 3, 4, 5, 6]
+    clf = KNeighborsClassifier(n_neighbors=1, algorithm='brute')
+    clf = clf.fit(x, y)
+    return clf.predict([predict])
+
+
+def rule_base(x, predict):
+    """Run rule base"""
+    feature_cnt = [0, 0, 0, 0, 0, 0]
+    tot_feature = len(x[0])
+    for feature in range(tot_feature):
+        for user in range(6):
+            if x[user][feature] > 5:
+                other = 0
+                for k in range(1, 6):
+                    other += x[(user+k)%6][feature]
+                if x[user][feature] > other:
+                    feature_cnt[user] += x[user][feature]
+    return feature_cnt.index(max(feature_cnt))+1
+
+
 
 
 def main():
@@ -52,8 +78,6 @@ def main():
     print("Testing folder: ", folder_path)
     subfolder = os.listdir(folder_path)
 
-    # Load Training data
-    sysmon_clf = decision_tree(sysmon_matrix)
 
     for testcase in subfolder:
         print("{index}: ".format(index=testcase), end='')
@@ -75,7 +99,10 @@ def main():
             except:
                 predict.append(0)
         print(predict)
-        ans = sysmon_clf.predict([predict])
+        # Load Training data
+        #ans = decision_tree(sysmon_matrix, predict)
+        ans = knn(sysmon_matrix, predict)
+        #ans = rule_base(sysmon_matrix, predict)
         print(ans)
 
 if __name__ == "__main__":
