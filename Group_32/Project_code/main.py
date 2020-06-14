@@ -70,7 +70,7 @@ def rule_base(x, predict):
     return feature_cnt.index(max(feature_cnt))+1
 
 
-def prediction(feature_name, matrix, cnt):
+def prediction(feature_name, matrix, cnt, model):
     """Count feature num and predict"""
     predict = []
     for feature in feature_name:
@@ -80,10 +80,14 @@ def prediction(feature_name, matrix, cnt):
             predict.append(0)
 
     print(predict)
-    #ans = decision_tree(matrix, predict)
-    ans = knn(matrix, predict)
-    #ans = rule_base(matrix, predict)
+    if model == 0:
+        ans = decision_tree(matrix, predict)[0]
+    elif model == 1:
+        ans = knn(matrix, predict)[0]
+    elif model == 2:
+        ans = rule_base(matrix, predict)
     print(ans)
+    return ans
 
 
 def main():
@@ -100,6 +104,7 @@ def main():
     for testcase in subfolder:
         # Data testing for sysmon
         print("{index}: ".format(index=testcase), end='')
+        ballot_box = [None, 0, 0, 0, 0, 0, 0]
         sysmon_data = load_xml(os.path.join(folder_path, testcase, "Sysmon.xml"))
         cnt = {}
         for event in sysmon_data['Events']['Event']:
@@ -113,10 +118,12 @@ def main():
 
         # Data normalize
         scale_sysmon = preprocessing.scale(sysmon_matrix)
-        prediction(sysmon_feature_name, scale_sysmon, cnt)
+        ballot = prediction(sysmon_feature_name, scale_sysmon, cnt, 1)
+        ballot_box[ballot] += 1
 
         normal_sysmon = preprocessing.normalize(sysmon_matrix)
-        prediction(sysmon_feature_name, normal_sysmon, cnt)
+        ballot = prediction(sysmon_feature_name, normal_sysmon, cnt, 1)
+        ballot_box[ballot] += 1
 
         # Data testing for security
         security_data = load_xml(os.path.join(folder_path, testcase, "Security.xml"))
@@ -129,10 +136,14 @@ def main():
                 cnt[feature] = 1
 
         scale_security = preprocessing.scale(security_matrix)
-        prediction(security_feature_name, scale_security, cnt)
+        ballot = prediction(security_feature_name, scale_security, cnt, 0)
+        ballot_box[ballot] += 1
 
         normal_security = preprocessing.scale(security_matrix)
-        prediction(security_feature_name, normal_security, cnt)
+        ballot = prediction(security_feature_name, normal_security, cnt, 0)
+        ballot_box[ballot] += 1
+
+        print(ballot_box)
 
 
 if __name__ == "__main__":
