@@ -124,25 +124,27 @@ def main():
                         cnt[feature] = 1
 
         # Data normalize
+        """
         scale_sysmon = preprocessing.scale(sysmon_matrix)
         ballot = prediction(sysmon_feature_name, scale_sysmon, cnt, KNN)
         ballot_box[ballot] += 1
         print(ballot)
+        """
 
         normal_sysmon = preprocessing.normalize(sysmon_matrix)
         ballot = prediction(sysmon_feature_name, normal_sysmon, cnt, KNN)
         ballot_box[ballot] += 1
-        print(ballot)
+        #print(ballot)
 
-        scale_sysmon = preprocessing.scale(sysmon_matrix)
-        ballot = prediction(sysmon_feature_name, scale_sysmon, cnt, RULE_BASE)
+        #scale_sysmon = preprocessing.scale(sysmon_matrix)
+        ballot = prediction(sysmon_feature_name, sysmon_matrix, cnt, RULE_BASE)
         ballot_box[ballot] += 1
-        print(ballot)
+        #print(ballot)
 
-        normal_sysmon = preprocessing.normalize(sysmon_matrix)
-        ballot = prediction(sysmon_feature_name, normal_sysmon, cnt, RULE_BASE)
-        ballot_box[ballot] += 1
-        print(ballot)
+        #normal_sysmon = preprocessing.normalize(sysmon_matrix)
+        #ballot = prediction(sysmon_feature_name, normal_sysmon, cnt, RULE_BASE)
+        #ballot_box[ballot] += 1
+        #print(ballot)
 
         # Data testing for security
         security_data = load_xml(os.path.join(folder_path, testcase, "Security.xml"))
@@ -157,12 +159,14 @@ def main():
         scale_security = preprocessing.scale(security_matrix)
         ballot = prediction(security_feature_name, scale_security, cnt, KNN)
         ballot_box[ballot] += 1
-        print(ballot)
+        #print(ballot)
 
+        """
         normal_security = preprocessing.normalize(security_matrix)
         ballot = prediction(security_feature_name, normal_security, cnt, KNN)
         ballot_box[ballot] += 1
         print(ballot)
+        """
 
         wireshark_data = load_json(os.path.join(folder_path, testcase, "Wireshark.json"))
         cnt = {}
@@ -183,14 +187,16 @@ def main():
         scale_wireshark = preprocessing.scale(wireshark_matrix)
         ballot = prediction(wireshark_feature_name, scale_wireshark, cnt, KNN)
         ballot_box[ballot] += 1
-        print(ballot)
+        #print(ballot)
 
+        """
         normal_wireshark = preprocessing.normalize(wireshark_matrix)
         ballot = prediction(wireshark_feature_name, normal_wireshark, cnt, KNN)
         ballot_box[ballot] += 1
         print(ballot)
+        """
 
-        print(ballot_box)
+        #print(ballot_box)
         print('person', str(ballot_box.index(max(ballot_box))))
 
 
