@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn import tree
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn import preprocessing
 
 from training_data import *
 
@@ -46,11 +47,6 @@ def decision_tree(x, predict):
 
 def knn(x, predict):
     """rum knn"""
-    # Data normalize
-    for i_idx, xi in enumerate(x):
-        xi_sum = sum(xi)
-        for j_idx, xj in enumerate(xi):
-            x[i_idx][j_idx] = xj/xi_sum
     y = [1, 2, 3, 4, 5, 6]
     clf = KNeighborsClassifier(n_neighbors=1, algorithm='brute')
     clf = clf.fit(x, y)
@@ -59,11 +55,6 @@ def knn(x, predict):
 
 def rule_base(x, predict):
     """Run rule base"""
-    # Data normalize
-    for i_idx, xi in enumerate(x):
-        xi_sum = sum(xi)
-        for j_idx, xj in enumerate(xi):
-            x[i_idx][j_idx] = xj/xi_sum
     feature_cnt = [0, 0, 0, 0, 0, 0]
     # total feature
     tot_feature = len(x[0])
@@ -113,10 +104,26 @@ def main():
         # Load Training data
         #ans = decision_tree(sysmon_matrix, predict)
         #print(ans)
-        ans = knn(sysmon_matrix, predict)
-        print(ans)
-        ans = rule_base(sysmon_matrix, predict)
-        print(ans)
+        #ans = knn(sysmon_matrix, predict)
+        #print(ans)
+        #ans = rule_base(sysmon_matrix, predict)
+        #print(ans)
+        # Data normalize
+        scale_sysmon = preprocessing.scale(sysmon_matrix)
+        #ans = decision_tree(scale_sysmon, predict)
+        #print("DT scale: {}".format(ans))
+        ans = knn(scale_sysmon, predict)
+        print("KNN scale: {}".format(ans))
+        ans = rule_base(scale_sysmon, predict)
+        print("RB scale: {}".format(ans))
+        normal_sysmon = preprocessing.normalize(sysmon_matrix)
+        #ans = decision_tree(normal_sysmon, predict)
+        #print("DT normal: {}".format(ans))
+        ans = knn(normal_sysmon, predict)
+        print("KNN normal: {}".format(ans))
+        ans = rule_base(normal_sysmon, predict)
+        print("RB normal: {}".format(ans))
+
 
 if __name__ == "__main__":
     main()
