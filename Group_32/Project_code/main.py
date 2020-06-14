@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 from sklearn import tree
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn import preprocessing
 
 from training_data import *
 
@@ -55,6 +56,7 @@ def knn(x, predict):
 def rule_base(x, predict):
     """Run rule base"""
     feature_cnt = [0, 0, 0, 0, 0, 0]
+    # total feature
     tot_feature = len(x[0])
     for feature in range(tot_feature):
         for user in range(6):
@@ -64,6 +66,7 @@ def rule_base(x, predict):
                     other += x[(user+k)%6][feature]
                 if x[user][feature] > other:
                     feature_cnt[user] += x[user][feature]
+
     return feature_cnt.index(max(feature_cnt))+1
 
 
@@ -75,6 +78,7 @@ def prediction(feature_name, matrix, cnt):
             predict.append(cnt[feature])
         except:
             predict.append(0)
+
     print(predict)
     #ans = decision_tree(matrix, predict)
     ans = knn(matrix, predict)
@@ -87,6 +91,7 @@ def main():
     if len(sys.argv) != 2:
         usage()
         return
+
     folder_path = str(sys.argv[1])
     print("Testing folder: ", folder_path)
     subfolder = os.listdir(folder_path)
@@ -105,7 +110,13 @@ def main():
                         cnt[feature] += 1
                     else:
                         cnt[feature] = 1
-        prediction(sysmon_feature_name, sysmon_matrix, cnt)
+
+        # Data normalize
+        scale_sysmon = preprocessing.scale(sysmon_matrix)
+        prediction(sysmon_feature_name, scale_sysmon, cnt)
+
+        normal_sysmon = preprocessing.normalize(sysmon_matrix)
+        prediction(sysmon_feature_name, normal_sysmon, cnt)
 
         # Data testing for security
         security_data = load_xml(os.path.join(folder_path, testcase, "Security.xml"))
@@ -116,7 +127,12 @@ def main():
                 cnt[feature] += 1
             else:
                 cnt[feature] = 1
-        prediction(security_feature_name, security_matrix, cnt)
+
+        scale_security = preprocessing.scale(security_matrix)
+        prediction(security_feature_name, scale_security, cnt)
+
+        normal_security = preprocessing.scale(security_matrix)
+        prediction(security_feature_name, normal_security, cnt)
 
 
 if __name__ == "__main__":
