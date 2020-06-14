@@ -67,6 +67,19 @@ def rule_base(x, predict):
     return feature_cnt.index(max(feature_cnt))+1
 
 
+def prediction(feature_name, matrix, cnt):
+    """Count feature num and predict"""
+    predict = []
+    for feature in feature_name:
+        try:
+            predict.append(cnt[feature])
+        except:
+            predict.append(0)
+    print(predict)
+    #ans = decision_tree(matrix, predict)
+    ans = knn(matrix, predict)
+    #ans = rule_base(matrix, predict)
+    print(ans)
 
 
 def main():
@@ -80,6 +93,7 @@ def main():
 
 
     for testcase in subfolder:
+        # Data testing for sysmon
         print("{index}: ".format(index=testcase), end='')
         sysmon_data = load_xml(os.path.join(folder_path, testcase, "Sysmon.xml"))
         cnt = {}
@@ -91,19 +105,19 @@ def main():
                         cnt[feature] += 1
                     else:
                         cnt[feature] = 1
+        prediction(sysmon_feature_name, sysmon_matrix, cnt)
 
-        predict = []
-        for feature in sysmon_feature_name:
-            try:
-                predict.append(cnt[feature])
-            except:
-                predict.append(0)
-        print(predict)
-        # Load Training data
-        #ans = decision_tree(sysmon_matrix, predict)
-        ans = knn(sysmon_matrix, predict)
-        #ans = rule_base(sysmon_matrix, predict)
-        print(ans)
+        # Data testing for security
+        security_data = load_xml(os.path.join(folder_path, testcase, "Security.xml"))
+        cnt = {}
+        for event in security_data['Events']['Event']:
+            feature = event['System'][security_name]
+            if feature in cnt.keys():
+                cnt[feature] += 1
+            else:
+                cnt[feature] = 1
+        prediction(security_feature_name, security_matrix, cnt)
+
 
 if __name__ == "__main__":
     main()
