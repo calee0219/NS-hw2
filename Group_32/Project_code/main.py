@@ -14,6 +14,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn import preprocessing
 
 from training_data import *
+TREE = 0
+KNN = 1
+RULE_BASE = 2
 
 
 def usage():
@@ -23,8 +26,12 @@ def usage():
 
 def load_json(path):
     """Load data from json file"""
-    with open(path, 'r') as reader:
-        json_data = json.loads(reader.read())
+    json_str = ""
+    with open(path, 'rb') as reader:
+        for line in reader:
+            line_str= str(line.decode('utf-8', errors="ignore"))
+            json_str += line_str
+        json_data = json.loads(json_str)
         return json_data
 
 
@@ -79,14 +86,14 @@ def prediction(feature_name, matrix, cnt, model):
         except:
             predict.append(0)
 
-    print(predict)
+    # print(predict)
     if model == 0:
         ans = decision_tree(matrix, predict)[0]
     elif model == 1:
         ans = knn(matrix, predict)[0]
     elif model == 2:
         ans = rule_base(matrix, predict)
-    print(ans)
+    # print(ans)
     return ans
 
 
@@ -97,14 +104,14 @@ def main():
         return
 
     folder_path = str(sys.argv[1])
-    print("Testing folder: ", folder_path)
+    # print("Testing folder: ", folder_path)
     subfolder = os.listdir(folder_path)
 
 
     for testcase in subfolder:
         # Data testing for sysmon
         print("{index}: ".format(index=testcase), end='')
-        ballot_box = [None, 0, 0, 0, 0, 0, 0]
+        ballot_box = [-1, 0, 0, 0, 0, 0, 0]
         sysmon_data = load_xml(os.path.join(folder_path, testcase, "Sysmon.xml"))
         cnt = {}
         for event in sysmon_data['Events']['Event']:
@@ -118,12 +125,24 @@ def main():
 
         # Data normalize
         scale_sysmon = preprocessing.scale(sysmon_matrix)
-        ballot = prediction(sysmon_feature_name, scale_sysmon, cnt, 1)
+        ballot = prediction(sysmon_feature_name, scale_sysmon, cnt, KNN)
         ballot_box[ballot] += 1
+        print(ballot)
 
         normal_sysmon = preprocessing.normalize(sysmon_matrix)
-        ballot = prediction(sysmon_feature_name, normal_sysmon, cnt, 1)
+        ballot = prediction(sysmon_feature_name, normal_sysmon, cnt, KNN)
         ballot_box[ballot] += 1
+        print(ballot)
+
+        scale_sysmon = preprocessing.scale(sysmon_matrix)
+        ballot = prediction(sysmon_feature_name, scale_sysmon, cnt, RULE_BASE)
+        ballot_box[ballot] += 1
+        print(ballot)
+
+        normal_sysmon = preprocessing.normalize(sysmon_matrix)
+        ballot = prediction(sysmon_feature_name, normal_sysmon, cnt, RULE_BASE)
+        ballot_box[ballot] += 1
+        print(ballot)
 
         # Data testing for security
         security_data = load_xml(os.path.join(folder_path, testcase, "Security.xml"))
@@ -136,14 +155,43 @@ def main():
                 cnt[feature] = 1
 
         scale_security = preprocessing.scale(security_matrix)
-        ballot = prediction(security_feature_name, scale_security, cnt, 0)
+        ballot = prediction(security_feature_name, scale_security, cnt, KNN)
         ballot_box[ballot] += 1
+        print(ballot)
 
-        normal_security = preprocessing.scale(security_matrix)
-        ballot = prediction(security_feature_name, normal_security, cnt, 0)
+        normal_security = preprocessing.normalize(security_matrix)
+        ballot = prediction(security_feature_name, normal_security, cnt, KNN)
         ballot_box[ballot] += 1
+        print(ballot)
+
+        wireshark_data = load_json(os.path.join(folder_path, testcase, "Wireshark.json"))
+        cnt = {}
+        for packet in wireshark_data:
+            layer = packet['_source']['layers']
+            try:
+                feature = layer['ip']['ip.dst']
+                if feature in cnt.keys():
+                    cnt[feature] += 1
+                else:
+                    cnt[feature] = 1
+            except:
+                if "jizz" in cnt.keys():
+                    cnt["jizz"] += 1
+                else:
+                    cnt["jizz"] = 1
+
+        scale_wireshark = preprocessing.scale(wireshark_matrix)
+        ballot = prediction(wireshark_feature_name, scale_wireshark, cnt, KNN)
+        ballot_box[ballot] += 1
+        print(ballot)
+
+        normal_wireshark = preprocessing.normalize(wireshark_matrix)
+        ballot = prediction(wireshark_feature_name, normal_wireshark, cnt, KNN)
+        ballot_box[ballot] += 1
+        print(ballot)
 
         print(ballot_box)
+        print('person', str(ballot_box.index(max(ballot_box))))
 
 
 if __name__ == "__main__":
