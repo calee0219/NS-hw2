@@ -66,9 +66,24 @@ def rule_base(x, predict):
                     other += x[(user+k)%6][feature]
                 if x[user][feature] > other:
                     feature_cnt[user] += x[user][feature]
+
     return feature_cnt.index(max(feature_cnt))+1
 
 
+def prediction(feature_name, matrix, cnt):
+    """Count feature num and predict"""
+    predict = []
+    for feature in feature_name:
+        try:
+            predict.append(cnt[feature])
+        except:
+            predict.append(0)
+
+    print(predict)
+    #ans = decision_tree(matrix, predict)
+    ans = knn(matrix, predict)
+    #ans = rule_base(matrix, predict)
+    print(ans)
 
 
 def main():
@@ -76,12 +91,14 @@ def main():
     if len(sys.argv) != 2:
         usage()
         return
+
     folder_path = str(sys.argv[1])
     print("Testing folder: ", folder_path)
     subfolder = os.listdir(folder_path)
 
 
     for testcase in subfolder:
+        # Data testing for sysmon
         print("{index}: ".format(index=testcase), end='')
         sysmon_data = load_xml(os.path.join(folder_path, testcase, "Sysmon.xml"))
         cnt = {}
@@ -94,35 +111,28 @@ def main():
                     else:
                         cnt[feature] = 1
 
-        predict = []
-        for feature in sysmon_feature_name:
-            try:
-                predict.append(cnt[feature])
-            except:
-                predict.append(0)
-        #print(predict)
-        # Load Training data
-        #ans = decision_tree(sysmon_matrix, predict)
-        #print(ans)
-        #ans = knn(sysmon_matrix, predict)
-        #print(ans)
-        #ans = rule_base(sysmon_matrix, predict)
-        #print(ans)
         # Data normalize
         scale_sysmon = preprocessing.scale(sysmon_matrix)
-        #ans = decision_tree(scale_sysmon, predict)
-        #print("DT scale: {}".format(ans))
-        ans = knn(scale_sysmon, predict)
-        print("KNN scale: {}".format(ans))
-        ans = rule_base(scale_sysmon, predict)
-        print("RB scale: {}".format(ans))
+        prediction(sysmon_feature_name, scale_sysmon, cnt)
+
         normal_sysmon = preprocessing.normalize(sysmon_matrix)
-        #ans = decision_tree(normal_sysmon, predict)
-        #print("DT normal: {}".format(ans))
-        ans = knn(normal_sysmon, predict)
-        print("KNN normal: {}".format(ans))
-        ans = rule_base(normal_sysmon, predict)
-        print("RB normal: {}".format(ans))
+        prediction(sysmon_feature_name, normal_sysmon, cnt)
+
+        # Data testing for security
+        security_data = load_xml(os.path.join(folder_path, testcase, "Security.xml"))
+        cnt = {}
+        for event in security_data['Events']['Event']:
+            feature = event['System'][security_name]
+            if feature in cnt.keys():
+                cnt[feature] += 1
+            else:
+                cnt[feature] = 1
+
+        scale_security = preprocessing.scale(security_matrix)
+        prediction(security_feature_name, scale_security, cnt)
+
+        normal_security = preprocessing.scale(security_matrix)
+        prediction(security_feature_name, normal_security, cnt)
 
 
 if __name__ == "__main__":
