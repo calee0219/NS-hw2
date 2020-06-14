@@ -46,6 +46,11 @@ def decision_tree(x, predict):
 
 def knn(x, predict):
     """rum knn"""
+    # Data normalize
+    for i_idx, xi in enumerate(x):
+        xi_sum = sum(xi)
+        for j_idx, xj in enumerate(xi):
+            x[i_idx][j_idx] = xj/xi_sum
     y = [1, 2, 3, 4, 5, 6]
     clf = KNeighborsClassifier(n_neighbors=1, algorithm='brute')
     clf = clf.fit(x, y)
@@ -54,7 +59,13 @@ def knn(x, predict):
 
 def rule_base(x, predict):
     """Run rule base"""
+    # Data normalize
+    for i_idx, xi in enumerate(x):
+        xi_sum = sum(xi)
+        for j_idx, xj in enumerate(xi):
+            x[i_idx][j_idx] = xj/xi_sum
     feature_cnt = [0, 0, 0, 0, 0, 0]
+    # total feature
     tot_feature = len(x[0])
     for feature in range(tot_feature):
         for user in range(6):
@@ -98,11 +109,13 @@ def main():
                 predict.append(cnt[feature])
             except:
                 predict.append(0)
-        print(predict)
+        #print(predict)
         # Load Training data
         #ans = decision_tree(sysmon_matrix, predict)
+        #print(ans)
         ans = knn(sysmon_matrix, predict)
-        #ans = rule_base(sysmon_matrix, predict)
+        print(ans)
+        ans = rule_base(sysmon_matrix, predict)
         print(ans)
 
 if __name__ == "__main__":
