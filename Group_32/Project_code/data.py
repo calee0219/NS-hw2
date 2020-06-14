@@ -14,6 +14,7 @@ import xmltodict
 import sklearn
 import pandas as pd
 event_name = "OriginalFileName"
+security_name = "EventID"
 
 
 def usage():
@@ -97,8 +98,8 @@ def collect_security(security):
             row.append(0)
     # Write security data into security_data.py
     with open("./training_data.py", 'a') as writer:
-        writer.write("\nevent_name = ")
-        writer.write('"'+event_name+'"')
+        writer.write("\nsecurity_name = ")
+        writer.write('"'+security_name+'"')
         writer.write("\nsecurity_feature_name = ")
         writer.write(str(feature_name))
         writer.write("\nsecurity_matrix = ")
@@ -122,7 +123,7 @@ def main():
         security_dict = load_xml(os.path.join(folder_path, person, "Security.xml"))
         security.append(security_dict)
 
-    #collect_sysmon(sysmon)
+    collect_sysmon(sysmon)
     collect_security(security)
 
 if __name__ == "__main__":
