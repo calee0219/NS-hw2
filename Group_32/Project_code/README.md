@@ -3,8 +3,8 @@
 ## Author
 - Group 32
     - 0856004 李家安
-    - 0616216 
-    - 0866020 
+    - 0616216 戴翊安
+    - 0866020 楊維鈞
     
 ## How to run the code
 1. Preprocess training data
