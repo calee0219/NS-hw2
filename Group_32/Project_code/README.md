@@ -2,9 +2,9 @@
 
 ## Author
 - Group 32
-    - 0856004 Chia-An Lee
-    - 0616216 Yi-An
-    - 0866020 W
+    - 0856004 李家安
+    - 0616216 
+    - 0866020 
     
 ## How to run the code
 1. Preprocess training data
