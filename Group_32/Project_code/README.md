@@ -46,3 +46,10 @@ We have seperate program to 2 steps
     data collection, we do the voting for the final result.
 
 ## Anything interesting you find or problems you encounter in the whole process
+- The sample testcase for Security.xml is last of Event. This made us difficult
+  to predict the result from it.
+- There are Chinese charactor in Wireshark.json. This made the json file
+  difficult to read and will error on decoding by default.
+- The training data is large. It makes my computer out of storage space.
+- Wireshark has a lot of feature. To dicided which is useful for us is a lot of
+  works.
